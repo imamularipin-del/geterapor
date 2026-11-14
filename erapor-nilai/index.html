@@ -182,7 +182,6 @@ const cf=(k,v)=>{S.cfg[k]=v.trim();save();hdr()};
 function set(){const c=S.cfg,f=(k,l,t)=>`<label>${l}</label><input type=${t||'text'} value="${esc(c[k])}" onchange="cf('${k}',this.value)">`;
 $('#m').innerHTML=`${S.auth?`<section class=card><h3>Akun</h3><div class=pv><b>${esc(S.auth.n||S.auth.u)}</b><br><small>${MO()?'Guru mapel '+MP.map(p=>esc(p[2])).join(', ')+(S.auth.all?' · semua kelas':' · kelas '+esc(S.auth.k)):S.auth.all?'Akses semua kelas':'Wali kelas '+esc(S.auth.k)}</small></div><button class="b d" style="width:100%" onclick="keluar()">Keluar</button></section>`:''}<section class=card><h3>Identitas</h3>${f('sek','Nama sekolah')}${f('guru','Wali kelas')}${f('sem','Semester & tahun ajaran')}<label>Kelas (menentukan deskripsi Pramuka)</label><select onchange="cf('kls',this.value)">${['Kelas Atas','Kelas Bawah'].map(k=>`<option ${k==c.kls?'selected':''}>${k}</option>`).join('')}</select></section>
 ${S.auth&&(!S.auth.all||MO())?'':kr()}
-${tpc()}
 <section class=card><h3>Google Sheet</h3>${f('url','URL Web App Apps Script','url')}<div class=bt><button class=b onclick="up()">⬆️ Kirim semua</button><button class="b s" onclick="down()">⬇️ Ambil data</button></div><button class="b s" style="width:100%" onclick="help()">Cara menyambungkan</button></section>
 <section class=card><h3>Siswa & data</h3><div class=bt>${MO()?'':`<button class="b s" onclick="ad()">➕ Tambah siswa</button>`}${MO()?'':`<button class="b d" onclick="hs()">🗑️ Hapus siswa</button>`}${!MO()&&(!S.auth||S.auth.all)?'<button class="b s" onclick="kls()">🏫 Kelas siswa</button>':''}<button class="b s" onclick="csv()">⬇️ CSV</button></div><div class=bt><button class="b s" onclick="xl()">📗 Excel</button><button class="b s" onclick="er()">📤 e-Rapor Pusat</button><button class="b s" onclick="rk()">📘 Export Rakumaku</button><button class="b s" onclick="bak()">💾 Backup JSON</button>${MO()?'':`<button class="b s" onclick="$('#rf').click()">📥 Pulihkan</button>`}</div>${MO()?'':`<div class=bt><button class="b s" onclick="demo()">🎲 Data contoh</button><button class="b d" onclick="hd()">🧹 Hapus contoh</button></div>`}<button class="b d" style="width:100%" onclick="rst()">Hapus semua nilai</button></section>
 <p class=ft>Versi 14-11-2026 · validasi R/T dari nilai real TP · KKM otomatis dari tabel kriteria mapel</p>`}
@@ -229,23 +228,14 @@ const dl=(t,n,m)=>{const a=document.createElement('a');a.href=URL.createObjectUR
 const bak=()=>{const b=S.demo&&S.bak?S.bak:S,d=new Date().toISOString();dl(JSON.stringify({v:1,tgl:d,cfg:{...S.cfg,url:''},sis:S.sis,sc:b.sc,pr:b.pr}),'backup-erapor-'+d.slice(0,10)+'.json','application/json')};
 function csv(){const R=rows(),Q=v=>`"${String(v).replace(/"/g,'""')}"`,L=[['No','Nama','NIPD',...MP.map(p=>p[1]),'Rata-rata','Peringkat'].map(Q).join(',')];R.forEach((r,i)=>L.push([i+1,r.s.n,r.s.id,...r.m.map(x=>x.n?x.nr:''),r.na?r.na.toFixed(1):'',r.na?r.rk:''].map(Q).join(',')));dl('\ufeff'+L.join('\n'),'rekap-nilai.csv','text/csv')}
 /* ---------- export Rakumaku ---------- */
-let tm=0;
-const tpd=c=>((S.cfg.tpd||{})[c])||[];
-const tpc=()=>{const c=MP[tm]||MP[0],T=tpd(c[0]);return`<section class=card><h3>Deskripsi TP (untuk export Rakumaku)</h3><label>Mata pelajaran</label><select onchange="tm=+this.value;set()">${MP.map((p,i)=>`<option value=${i} ${i==tm?'selected':''}>${esc(p[1])}</option>`).join('')}</select>${Array.from({length:10},(_,i)=>`<label>TP${i+1}</label><input value="${esc(T[i]||'')}" placeholder="mis. membaca teks narasi dengan lancar" onchange="stp(${i},this.value)">`).join('')}<small>Dipakai untuk kolom Deskripsi Maks/Min. Tulis tanpa awalan nama; kalimatnya dirangkai otomatis. Tersimpan di perangkat ini dan ikut Backup JSON.</small></section>`};
-function stp(i,v){const c=MP[tm]||MP[0];S.cfg.tpd=S.cfg.tpd||{};const a=[...tpd(c[0])];while(a.length<10)a.push('');a[i]=v.trim();S.cfg.tpd[c[0]]=a;save();toast('TP tersimpan')}
 const rkSlug=t=>String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const rkName=(p,k)=>{const t=S.cfg.sem||'',y=t.match(/(\d{4})\s*[\/\-–]\s*(\d{4})/),g=t.match(/ganjil|genap/i),a=[rkSlug(p[1])];if(k)a.push(rkSlug(k));if(y)a.push('TA',y[1],y[2]);if(g)a.push(g[0].toLowerCase());return a.join('_')};
 const rkBl=v=>v===''||v==null||isNaN(v);
-async function rkBook(p,L,mode){const c=p[0],k=kk(c),T=tpd(c),wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Sheet1'),
- tx=j=>(T[j]||'').trim()||('TP'+(j+1)),lv=a=>pred(mode=='real'?conv(a,c):a,k),
- dx=(n,l,t)=>l==3?`${n} masih perlu bimbingan dalam ${t}`:`${n} menunjukkan penguasaan yang ${PM[l]} dalam ${t}`,
- dn=(n,l,t)=>l<=1?`${n} masih dapat ditingkatkan dalam ${t}`:l==2?`${n} perlu peningkatan dalam ${t}`:`${n} perlu bimbingan dalam ${t}`;
+/* Hanya kolom A–N (NIS, Nama, Kelas, Mapel, TP1–TP10) yang diisi; kolom O dst. dibiarkan kosong (dihitung Rakumaku). */
+async function rkBook(p,L){const c=p[0],wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Sheet1');
 ws.columns=[12,30,8,28,...Array(10).fill(6),11,10,11,62,10,62].map(width=>({width}));
 ws.addRow(['NIS','Nama','Kelas','Mapel',...Array.from({length:10},(_,i)=>'TP'+(i+1)),'Rata-rata','Predikat','Nilai Maks','Deskripsi Maks','Nilai Min','Deskripsi Min']);
-L.forEach(s=>{const t=(S.sc[c]||{})[s.id]||[],x=cs(t,c),v=Array.from({length:10},(_,j)=>rkBl(t[j])?'':mode=='real'?+t[j]:conv(+t[j],c)),
- o=v.map((a,j)=>a===''?null:{a,j}).filter(Boolean);let mx='',mn='',d1='',d2='';
- if(o.length){const hi=Math.max(...o.map(z=>z.a)),lo=Math.min(...o.map(z=>z.a)),h=o.find(z=>z.a==hi);mx=hi;mn=lo;d1=dx(s.n,lv(hi),tx(h.j));if(hi>lo){const l=o.find(z=>z.a==lo);d2=dn(s.n,lv(lo),tx(l.j))}}
- ws.addRow([String(s.id),s.n,s.k||'',p[1],...v,x.n?(mode=='real'?+x.na.toFixed(2):x.nr):'',x.n?'ABCD'[pred(x.nr,k)]:'',mx,d1,mn,d2])});
+L.forEach(s=>{const t=(S.sc[c]||{})[s.id]||[];ws.addRow([String(s.id),s.n,s.k||'',p[1],...Array.from({length:10},(_,j)=>rkBl(t[j])?'':+t[j])])});
 ws.eachRow(r=>r.eachCell({includeEmpty:true},e=>{e.font={name:'Arial',size:10}}));
 return await wb.xlsx.writeBuffer()}
 async function rk(){
@@ -253,19 +243,18 @@ if(S.demo)return SW.fire({icon:'warning',title:'Mode contoh aktif',text:'Export 
 if(!window.ExcelJS)return SW.fire('Gagal','Pustaka Excel belum termuat. Periksa koneksi internet.','error');
 const gr={};VS().forEach(s=>(gr[s.k||'']=gr[s.k||'']||[]).push(s));const ks=Object.keys(gr);
 if(!ks.length)return SW.fire('Belum ada siswa','Tambahkan atau muat data siswa dulu.','info');
-const r=await SW.fire({title:'Export ke Rakumaku',html:`<div style="text-align:left"><label>Mata pelajaran</label><select id=rm>${MP.length>1?`<option value=-1>Semua mapel (${MP.length})</option>`:''}${MP.map((p,i)=>`<option value=${i} ${i==mp?'selected':''}>${esc(p[1])}</option>`).join('')}</select><label>Isi kolom TP dengan</label><select id=rv><option value=rapor>Nilai rapor (hasil konversi)</option><option value=real>Nilai real</option></select><small>Kelas: ${ks.map(k=>esc(k||'tanpa kelas')).join(', ')}. Satu file per mapel per kelas.</small></div>`,showCancelButton:true,confirmButtonText:'Export',preConfirm:()=>({m:+$('#rm').value,v:$('#rv').value})});
-if(!r.value)return;const{m,v}=r.value,ps=m<0?MP:[MP[m]],fs=[];
+const r=await SW.fire({title:'Export ke Rakumaku',html:`<div style="text-align:left"><label>Mata pelajaran</label><select id=rm>${MP.length>1?`<option value=-1>Semua mapel (${MP.length})</option>`:''}${MP.map((p,i)=>`<option value=${i} ${i==mp?'selected':''}>${esc(p[1])}</option>`).join('')}</select><small>Kelas: ${ks.map(k=>esc(k||'tanpa kelas')).join(', ')}. Satu file per mapel per kelas; hanya kolom NIS sampai TP10 yang diisi (nilai real).</small></div>`,showCancelButton:true,confirmButtonText:'Export',preConfirm:()=>({m:+$('#rm').value})});
+if(!r.value)return;const m=r.value.m,ps=m<0?MP:[MP[m]],fs=[];
 Swal.showLoading&&SW.fire({title:'Menyiapkan file…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
-try{for(const p of ps)for(const k of ks)fs.push([rkName(p,k)+'.xlsx',await rkBook(p,gr[k],v)]);
+try{for(const p of ps)for(const k of ks)fs.push([rkName(p,k)+'.xlsx',await rkBook(p,gr[k])]);
 const X='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',d=new Date().toISOString().slice(0,10);
 if(fs.length==1)dl(fs[0][1],fs[0][0],X);else{if(!window.JSZip)return SW.fire('Gagal','Pustaka ZIP belum termuat. Pilih satu mapel saja atau periksa koneksi.','error');const z=new JSZip();fs.forEach(f=>z.file(f[0],f[1]));dl(await z.generateAsync({type:'uint8array'}),'rakumaku-'+d+'.zip','application/zip')}
-const kos=ps.filter(p=>!tpd(p[0]).some(x=>(x||'').trim())).length;
-SW.fire({icon:kos?'info':'success',title:'Export selesai',text:fs.length+' file '+(fs.length>1?'dalam ZIP ':'')+'siap diunggah.'+(kos?' Deskripsi TP belum diisi untuk '+kos+' mapel, jadi deskripsi memakai "TP1", "TP2", dst. (Setelan › Deskripsi TP).':'')})}
+SW.fire({icon:'success',title:'Export selesai',text:fs.length+' file '+(fs.length>1?'dalam ZIP ':'')+'siap diunggah ke Rakumaku.'})}
 catch(e){SW.fire('Gagal','Terjadi kesalahan saat membuat file.','error')}}
 /* ---------- guru mapel & pemilih kelas ---------- */
 const MPA=MP.slice();
 const MO=()=>!!(S.auth&&S.auth.m&&S.auth.m.length);
-function applyMp(){const m=MO()?S.auth.m:null;MP.splice(0,MP.length,...MPA.filter(p=>!m||m.includes(p[0])));mp=0;km=0;tm=0}
+function applyMp(){const m=MO()?S.auth.m:null;MP.splice(0,MP.length,...MPA.filter(p=>!m||m.includes(p[0])));mp=0;km=0}
 const KL=()=>[...new Set(S.sis.map(s=>s.k).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'id',{numeric:true}));
 const VS=()=>{const k=S.fk;return k&&KL().length>1&&KL().includes(k)?S.sis.filter(s=>s.k==k):S.sis};
 function setFk(v){S.fk=v;save();render()}
