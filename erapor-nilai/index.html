@@ -76,8 +76,10 @@ Ralin Rahmadani|212201029
 Shyfa Inaya Hassya|212201030
 Zulfa Patricia Maaike|212201031
 Syakira Pramudita Azniana|252605024`.split('\n').map(l=>{const[n,id]=l.split('|');return{n,id}});
+const DEFURL='https://script.google.com/macros/s/AKfycbzCj8HlySAhSpM4DAMczgCTpxfnw4MqPonSdq-WWBjoQfsCy9phSjfX0pp6OG7sIzlenA/exec'; /* ← tempel URL Web App Apps Script (…/exec) di antara tanda kutip agar semua perangkat otomatis terhubung ke Sheet */
 const LS='erapor2026';let S;try{S=JSON.parse(localStorage.getItem(LS))}catch(e){}
-S=S||{sis:DEF,sc:{},pr:{},cfg:{sek:'Nama Sekolah',kls:'Kelas Atas',sem:'Semester Ganjil 2026/2027',guru:'',url:''}};
+S=S||{sis:DEF,sc:{},pr:{},cfg:{sek:'Nama Sekolah',kls:'Kelas Atas',sem:'Semester Ganjil 2026/2027',guru:'',url:DEFURL}};
+if(!S.cfg.url)S.cfg.url=DEFURL;
 const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const SW=Swal.mixin({confirmButtonColor:'#0e3b3c',denyButtonColor:'#c98a0a',cancelButtonColor:'#8a9a98'});
@@ -98,7 +100,8 @@ const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
 const bdg=v=>v===1?'<em class=ok>Valid</em>':v===0?'<em class=no>Tdk valid</em>':'';
 /* ---------- sinkron Google Sheet ---------- */
 function sb(x){const e=$('#sy');if(!e)return;e.textContent=!S.cfg.url?'Lokal':x=='⏳'?'Menyinkron…':x=='!'?'Gagal sinkron':'Tersinkron';e.className=x=='!'?'bad':''}
-async function push(o){if(!S.cfg.url)return;sb('⏳');try{const j=await(await fetch(S.cfg.url,{method:'POST',body:JSON.stringify(o)})).json();sb(j.ok?'✓':'!');return !!j.ok}catch(e){sb('!');return false}}
+async function push(o){if(!S.cfg.url)return;sb('⏳');try{const j=await(await fetch(S.cfg.url,{method:'POST',body:JSON.stringify(o)})).json();S.dirty=!j.ok;save();sb(j.ok?'✓':'!');return !!j.ok}catch(e){S.dirty=true;save();sb('!');return false}}
+async function boot(){if(!S.cfg.url)return;const all=()=>push({action:'sync',siswa:S.sis,sc:S.sc,pr:S.pr});try{if(S.dirty){await all();return}sb('⏳');const j=await(await fetch(S.cfg.url+(S.cfg.url.includes('?')?'&':'?')+'t='+Date.now())).json();if(!j.ok)throw 0;if(!(j.siswa&&j.siswa.length)){await all();return}S.sis=j.siswa;S.sc=j.sc||{};S.pr=j.pr||{};save();render()}catch(e){sb('!')}}
 async function up(){if(!S.cfg.url)return SW.fire('Isi URL dulu','Lihat "Cara menyambungkan".','info');Swal.showLoading&&SW.fire({title:'Mengirim…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});const ok=await push({action:'sync',siswa:S.sis,sc:S.sc,pr:S.pr});ok?SW.fire('Berhasil','Semua data tersimpan di Google Sheet.','success'):SW.fire('Gagal','Periksa URL & izin akses Web App.','error')}
 async function down(){if(!S.cfg.url)return SW.fire('Isi URL dulu','','info');if(!(await SW.fire({title:'Ganti data lokal dengan data Sheet?',icon:'question',showCancelButton:true,confirmButtonText:'Ya, ambil'})).isConfirmed)return;sb('⏳');try{const j=await(await fetch(S.cfg.url+(S.cfg.url.includes('?')?'&':'?')+'t='+Date.now())).json();if(j.siswa&&j.siswa.length)S.sis=j.siswa;S.sc=j.sc||{};S.pr=j.pr||{};save();sb('✓');toast('Data dimuat dari Sheet');render()}catch(e){sb('!');SW.fire('Gagal','Periksa URL & izin akses Web App.','error')}}
 /* ---------- tampilan ---------- */
@@ -153,5 +156,5 @@ function rst(){SW.fire({title:'Hapus semua nilai?',text:'Data di Google Sheet ti
 const dl=(t,n,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()};
 const bak=()=>dl(JSON.stringify(S),'backup-erapor.json','application/json');
 function csv(){const R=rows(),Q=v=>`"${String(v).replace(/"/g,'""')}"`,L=[['No','Nama','NIPD',...MP.map(p=>p[1]),'Rata-rata','Peringkat'].map(Q).join(',')];R.forEach((r,i)=>L.push([i+1,r.s.n,r.s.id,...r.m.map(x=>x.n?x.nr:''),r.na?r.na.toFixed(1):'',r.na?r.rk:''].map(Q).join(',')));dl('\ufeff'+L.join('\n'),'rekap-nilai.csv','text/csv')}
-render();
+render();boot();
 </script></body></html>
