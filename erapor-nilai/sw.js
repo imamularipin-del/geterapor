@@ -1,6 +1,6 @@
 /* Service worker GetErapor: agar aplikasi bisa dibuka offline.
    Naikkan nomor V setiap kali index.html diperbarui agar cache lama dibuang. */
-const V = 'geterapor-v1';
+const V = 'geterapor-v2';
 const SHELL = ['./', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 const LIBS = [
   'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js',
