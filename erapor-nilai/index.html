@@ -1,1 +1,157 @@
-
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e3b3c"><meta name="mobile-web-app-capable" content="yes"><title>Nilai e-Rapor</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--ink:#0e3b3c;--ac:#f2b233;--bg:#f3f6f3;--ln:#e1e8e2;--mu:#667a79;--ok:#0f9d6b;--no:#d9480f;--lo:#fff1e6}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#cfd9d4;color:#142b2b;display:flex;justify-content:center}
+#app{width:100%;max-width:430px;min-height:100vh;min-height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative}
+@media(min-width:600px){#app{margin:18px 0;min-height:0;height:calc(100vh - 36px);border-radius:34px;box-shadow:0 24px 70px #0e3b3c55;overflow:hidden}#m{overflow:auto}}
+header{background:var(--ink);color:#fff;padding:calc(16px + env(safe-area-inset-top,0px)) 18px 52px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+header h1{font-size:17px;line-height:1.25}header small{opacity:.75;font-size:12px}
+#sy{font:600 11px system-ui;background:#ffffff22;padding:4px 10px;border-radius:12px;white-space:nowrap}#sy.bad{background:var(--no)}
+#m{flex:1;padding:0 14px 18px;margin-top:-36px;position:relative}
+.card{background:#fff;border:1px solid var(--ln);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px #0e3b3c0d}
+h3{font-size:14px;margin-bottom:8px}small{color:var(--mu);font-size:12px}
+.hero{background:linear-gradient(135deg,var(--ink),#1c6b66);color:#fff;border:0}.hero small{color:#cfe6e0}.big{font:700 46px/1.1 system-ui;display:block;margin:4px 0;font-variant-numeric:tabular-nums}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g2 .card{margin:0}.st b{display:block;font-size:22px}.g2{margin-bottom:12px}
+.pg{display:flex;align-items:center;gap:8px;margin:6px 0}.pg span{width:50px;font-size:12px}.pg i{flex:1;height:8px;background:#e3ebe6;border-radius:6px;overflow:hidden}.pg u{display:block;height:100%;background:var(--ink)}
+.tp{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--ln)}.tp b{width:24px;height:24px;border-radius:50%;background:var(--ac);display:grid;place-items:center;font-size:12px}.tp span{margin-left:auto;font-weight:700}
+.row{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--ln);border-radius:16px;padding:10px 12px;margin-bottom:8px;cursor:pointer}.row:active{background:#eef5f1}
+.av{width:38px;height:38px;border-radius:50%;background:#e0efe9;color:var(--ink);display:grid;place-items:center;font-size:13px;flex:none}
+.gr{flex:1;min-width:0}.nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots u{display:inline-block;width:9px;height:9px;border-radius:50%;background:#dfe6e2;margin:3px 3px 0 0}.dots .t{background:var(--ok)}.dots .r{background:var(--ac)}
+.sc{text-align:right}.sc b{font-size:20px;display:block;line-height:1;font-variant-numeric:tabular-nums}
+em{font:600 10px system-ui;padding:2px 7px;border-radius:9px;font-style:normal}em.ok{background:#dcf5ea;color:#0a7a52}em.no{background:var(--lo);color:var(--no)}
+.em{text-align:center;color:var(--mu);padding:20px}.ft{text-align:center;color:var(--mu);font-size:12px;margin:6px 0}
+label{font-weight:600;font-size:12px;color:var(--mu);display:block;margin-top:6px}
+select,input{width:100%;padding:11px 12px;border:1px solid var(--ln);border-radius:12px;font:inherit;background:#fff;margin:5px 0}
+.bt{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.b{flex:1;padding:11px;border:0;border-radius:12px;background:var(--ink);color:#fff;font:600 13px system-ui;white-space:nowrap}.b.s{background:#e3eee9;color:var(--ink)}.b.d{background:#fde8e1;color:var(--no)}
+.tw{overflow-x:auto;margin:6px -14px 0;padding:0 14px}table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 6px;border-bottom:1px solid var(--ln);text-align:center;white-space:nowrap}th{background:#e6efea}
+.n{text-align:left;max-width:130px;overflow:hidden;text-overflow:ellipsis}td.n{position:sticky;left:0;background:#fff}.lo{background:var(--lo);color:var(--no)}tfoot td{font-weight:700;background:#f3f6f3}
+nav{position:sticky;bottom:0;display:flex;background:#fff;border-top:1px solid var(--ln);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+nav button{flex:1;border:0;background:0;font:600 11px system-ui;color:var(--mu);padding:3px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav i{font-style:normal;font-size:19px;filter:grayscale(1);opacity:.6;padding:2px 14px;border-radius:12px}nav .on{color:var(--ink)}nav .on i{filter:none;opacity:1;background:var(--ac)}
+.swal2-popup{font-family:system-ui!important;border-radius:24px!important;max-width:100%}.swal2-html-container{font-size:14px!important}
+.tpg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.tpg label{text-align:center;font-size:10px;margin:0}.tpg input{padding:9px 1px;text-align:center;font-size:15px;margin:2px 0}
+.sm{color:var(--mu);font-size:12px;margin-bottom:8px}.pv{margin-top:10px;padding:9px;background:#f3f6f3;border-radius:12px;font-size:13px}
+#pr{display:none}
+@media print{body{display:block;background:#fff}body>:not(#pr){display:none!important}#pr{display:block;color:#000;font-size:11px}#pr table{font-size:10px}#pr th,#pr td{border:1px solid #444;padding:4px}#pr th{background:#eee}#pr .pb{page-break-after:always}#pr h2{font-size:15px;margin-bottom:6px}}
+</style></head><body>
+<div id="app"><header><div><h1 id="hs"></h1><small id="hk"></small></div><span id="sy"></span></header><main id="m"></main><nav id="nv"></nav></div>
+<div id="pr"></div><style id="pg"></style>
+<script>
+const MP=[['PAdBP','Pendidikan Agama Islam dan Budi Pekerti','PAI'],['PKn','Pendidikan Kewarganegaraan','PKn'],['bindo','Bahasa Indonesia','B.Ind'],['mtk','Matematika','MTK'],['ipas','Ilmu Pengetahuan Alam dan Sosial (IPAS)','IPAS'],['sdb','Seni dan Budaya','SBK'],['pjok','Pendidikan Jasmani, Olahraga dan Kesehatan','PJOK'],['bsunda','Bahasa Sunda','B.Snd'],['bingg','Bahasa Inggris','B.Ing'],['mgc','Muatan Gunung Ciremai','MGC'],['koding','Koding Artifisial','Koding']];
+const KB=[20,25,30,40,45,50,55,60,65,70,75,80,85,90,95],KJ=[74,75,76,77,78,79,80,81,82,83,84,86,88,92,96],K=74;
+const PM=['sangat baik','baik','cukup','perlu bimbingan'],PL=['A · Sangat Baik','B · Baik','C · Cukup','D · Perlu Bimbingan'];
+const TABS=[['home','Beranda','🏠'],['inp','Input','✏️'],['rek','Rekap','📊'],['pra','Pramuka','⛺'],['set','Setelan','⚙️']];
+const DEF=`Aditya Noufal Dairy|212201001
+Afisha Meilina Putri|212201002
+Al Ghifari Hudzaifal|212201003
+Al-Zahran Ramadhan Gumilar|212201004
+Aqila Fatrha Quinsha|212201005
+Armi Triansah|212201006
+Arum Nur Aisah|212201007
+Athalla Reizakky Saputra|212201008
+Ayeisha Tabina Sutarno|212201009
+Desi Septiyani Zahra|212201010
+Erlangga Maullid Raharja|212201011
+Farrel Naufal Sabian|212201012
+Humayra Nabilla|212201013
+Khaira Salwa Nabila|212201015
+Lolyta Oktaviani|212201016
+Mitha Triana Putri|212201017
+Muhammad Akbar Haqiqi|212201018
+Muhammad Arrafa Alghyfari|212201019
+Muhammad Azka Pratama|212201020
+Muhammad Dik Dik Irawan|212201021
+Muhammad Saddam|212201022
+Naura Hazna Annida|212201023
+Nazhifa Hilyah Muthma'Innah|212201024
+Princessta Nidia Sari|212201025
+Qiara Tepy Segara|212201027
+Rahma Aulia|212201028
+Ralin Rahmadani|212201029
+Shyfa Inaya Hassya|212201030
+Zulfa Patricia Maaike|212201031
+Syakira Pramudita Azniana|252605024`.split('\n').map(l=>{const[n,id]=l.split('|');return{n,id}});
+const LS='erapor2026';let S;try{S=JSON.parse(localStorage.getItem(LS))}catch(e){}
+S=S||{sis:DEF,sc:{},pr:{},cfg:{sek:'Nama Sekolah',kls:'Kelas Atas',sem:'Semester Ganjil 2026/2027',guru:'',url:''}};
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SW=Swal.mixin({confirmButtonColor:'#0e3b3c',denyButtonColor:'#c98a0a',cancelButtonColor:'#8a9a98'});
+const T=Swal.mixin({toast:true,position:'top',showConfirmButton:false,timer:1700,timerProgressBar:true}),toast=m=>T.fire({icon:'success',title:m||'Tersimpan'});
+let tab='home',mp=0,q='',CH={};
+/* ---------- logika nilai (mengikuti sheet) ---------- */
+const conv=v=>{for(let i=0;i<15;i++)if(v<=KB[i])return KJ[i];return 100};
+const num=a=>(a||[]).filter(x=>x!==''&&x!=null&&!isNaN(x)).map(Number),avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const cs=a=>{const t=num(a),r=t.map(conv),R=r.filter(v=>(v<K?v-1:v)==K).length,T=r.length-R,na=avg(t);return{n:t.length,na,nr:Math.round(avg(r)),nR:R,nT:T,val:t.length&&T?(R||na==100?1:0):''}};
+const calc=(c,id)=>cs((S.sc[c]||{})[id]);
+const pred=n=>n>=92?0:n>=84?1:n>=74?2:3,fmt=v=>Number.isInteger(v)?v:v.toFixed(1);
+const rows=()=>{const R=S.sis.map(s=>{const m=MP.map(p=>calc(p[0],s.id)),f=m.filter(x=>x.n);return{s,m,na:f.length?avg(f.map(x=>x.nr)):0}});return R.map(r=>({...r,rk:1+R.filter(o=>o.na>r.na).length}))};
+const pg=p=>{const z=p.reduce((a,v)=>a+(+v||0),0);return z<=3?'D':z<=6?'C':z<=9?'B':'A'};
+const pv=id=>{const p=S.pr[id];return p&&p.some(v=>v!=='')?p:null};
+const mt=()=>{const a=S.cfg.kls=='Kelas Atas';return[`menghayati dan berupaya menjalankan ${a?'Tri':'Dwi'} Satya sebagai janji utama Pramuka, fokus pada kesetiaan dan komitmen dasar`,`mengenal dan memahami sepuluh nilai ${a?'Dasa':'Dwi'} Darma, khususnya nilai-nilai dasar seperti takwa, cinta alam, dan patriotisme`,`mempelajari dan mempraktikkan Keterampilan Pramuka dasar, termasuk simpul dasar, ${a?'baris-berbaris (PBB), dan tanda jejak':'dan baris-berbaris (PBB)'}`]};
+const prd=s=>{const p=pv(s.id);if(!p)return'Belum diisi.';const m=mt(),w=i=>PM[4-(+p[i]||1)];return`${s.n} ${w(0)} ${m[0]}, ${w(1)} ${m[1]}, ${w(2)} ${m[2]}.`};
+const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const bdg=v=>v===1?'<em class=ok>Valid</em>':v===0?'<em class=no>Tdk valid</em>':'';
+/* ---------- sinkron Google Sheet ---------- */
+function sb(x){const e=$('#sy');if(!e)return;e.textContent=!S.cfg.url?'Lokal':x=='⏳'?'Menyinkron…':x=='!'?'Gagal sinkron':'Tersinkron';e.className=x=='!'?'bad':''}
+async function push(o){if(!S.cfg.url)return;sb('⏳');try{const j=await(await fetch(S.cfg.url,{method:'POST',body:JSON.stringify(o)})).json();sb(j.ok?'✓':'!');return !!j.ok}catch(e){sb('!');return false}}
+async function up(){if(!S.cfg.url)return SW.fire('Isi URL dulu','Lihat "Cara menyambungkan".','info');Swal.showLoading&&SW.fire({title:'Mengirim…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});const ok=await push({action:'sync',siswa:S.sis,sc:S.sc,pr:S.pr});ok?SW.fire('Berhasil','Semua data tersimpan di Google Sheet.','success'):SW.fire('Gagal','Periksa URL & izin akses Web App.','error')}
+async function down(){if(!S.cfg.url)return SW.fire('Isi URL dulu','','info');if(!(await SW.fire({title:'Ganti data lokal dengan data Sheet?',icon:'question',showCancelButton:true,confirmButtonText:'Ya, ambil'})).isConfirmed)return;sb('⏳');try{const j=await(await fetch(S.cfg.url+(S.cfg.url.includes('?')?'&':'?')+'t='+Date.now())).json();if(j.siswa&&j.siswa.length)S.sis=j.siswa;S.sc=j.sc||{};S.pr=j.pr||{};save();sb('✓');toast('Data dimuat dari Sheet');render()}catch(e){sb('!');SW.fire('Gagal','Periksa URL & izin akses Web App.','error')}}
+/* ---------- tampilan ---------- */
+const go=t=>{tab=t;render();$('#m').scrollTop=0;scrollTo(0,0)};
+function hdr(){$('#hs').textContent=S.cfg.sek;$('#hk').textContent=S.cfg.kls+' · '+S.cfg.sem;sb('✓')}
+function render(){$('#nv').innerHTML=TABS.map(([k,l,i])=>`<button class="${k==tab?'on':''}" onclick="go('${k}')"><i>${i}</i>${l}</button>`).join('');hdr();({home,inp,rek,pra,set})[tab]()}
+function ch(id,c){if(!window.Chart)return;CH[id]&&CH[id].destroy();CH[id]=new Chart($('#'+id),c)}
+function home(){const R=rows(),on=R.filter(r=>r.na>0),ts=R.length*MP.length,fl=R.reduce((a,r)=>a+r.m.filter(x=>x.n).length,0),vd=R.reduce((a,r)=>a+r.m.filter(x=>x.val===1).length,0),ra=avg(on.map(r=>r.na)),top=[...on].sort((a,b)=>b.na-a.na),hi=top[0],lo=top[top.length-1],
+pm=MP.map((p,i)=>avg(R.filter(r=>r.m[i].n).map(r=>r.m[i].nr))),pc=MP.map((p,i)=>R.filter(r=>r.m[i].n).length),pd=[0,0,0,0];on.forEach(r=>pd[pred(r.na)]++);
+$('#m').innerHTML=`<section class="card hero"><small>Rata-rata nilai rapor kelas</small><b class=big>${ra?ra.toFixed(1):'–'}</b><small>${on.length} dari ${R.length} siswa sudah memiliki nilai</small></section>
+<div class=g2><div class="card st"><b>${Math.round(fl/ts*100)||0}%</b><small>Kelengkapan input</small></div><div class="card st"><b>${fl?Math.round(vd/fl*100):0}%</b><small>Valid e-Rapor</small></div>
+<div class="card st"><b>${hi?hi.na.toFixed(1):'–'}</b><small>Tertinggi · ${hi?esc(hi.s.n.split(' ')[0]):'-'}</small></div><div class="card st"><b>${lo?lo.na.toFixed(1):'–'}</b><small>Terendah · ${lo?esc(lo.s.n.split(' ')[0]):'-'}</small></div></div>
+<section class=card><h3>Rata-rata per mata pelajaran</h3><div style="height:310px"><canvas id=c1></canvas></div></section>
+<section class=card><h3>Sebaran predikat siswa</h3><div style="height:200px"><canvas id=c2></canvas></div></section>
+<section class=card><h3>Progres input per mapel</h3>${MP.map((p,i)=>`<div class=pg><span>${p[2]}</span><i><u style="width:${pc[i]/R.length*100}%"></u></i><small>${pc[i]}/${R.length}</small></div>`).join('')}</section>
+<section class=card><h3>Peringkat 5 besar</h3>${top.slice(0,5).map((r,i)=>`<div class=tp><b>${i+1}</b>${esc(r.s.n)}<span>${r.na.toFixed(1)}</span></div>`).join('')||'<p class=em>Belum ada nilai</p>'}</section>`;
+ch('c1',{type:'bar',data:{labels:MP.map(p=>p[2]),datasets:[{data:pm.map(v=>+v.toFixed(1)),backgroundColor:'#1c6b66',borderRadius:6}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:70,max:100}}}});
+ch('c2',{type:'doughnut',data:{labels:PL,datasets:[{data:pd,backgroundColor:['#0f9d6b','#1c6b66','#f2b233','#d9480f']}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12}}}}})}
+/* ---------- input nilai ---------- */
+function inp(){$('#m').innerHTML=`<section class=card><label>Mata pelajaran</label><select onchange="mp=+this.value;lst()">${MP.map((p,i)=>`<option value=${i} ${i==mp?'selected':''}>${p[1]}</option>`).join('')}</select><input type=search placeholder="Cari nama / NIPD…" oninput="q=this.value;lst()" value="${esc(q)}"><small id=ii></small></section><div id=ls></div>`;lst()}
+function lst(){const c=MP[mp][0],f=q.toLowerCase(),L=S.sis.filter(s=>(s.n+s.id).toLowerCase().includes(f));$('#ii').textContent=`${S.sis.filter(s=>calc(c,s.id).n).length}/${S.sis.length} siswa terisi · ketuk untuk input`;
+$('#ls').innerHTML=L.map(s=>{const x=calc(c,s.id),t=(S.sc[c]||{})[s.id]||[];return`<div class=row data-id="${esc(s.id)}" onclick="ed(this.dataset.id)"><b class=av>${ini(s.n)}</b><div class=gr><div class=nm>${esc(s.n)}</div><small>${esc(s.id)}</small><div class=dots>${Array.from({length:10},(_,k)=>{const v=t[k],e=v===''||v==null;return`<u class="${e?'':conv(+v)>K?'t':'r'}"></u>`}).join('')}</div></div><div class=sc><b>${x.n?x.nr:'–'}</b><small>${x.n?'NA '+fmt(x.na):'kosong'}</small><br>${bdg(x.val)}</div></div>`}).join('')||'<p class=em>Siswa tidak ditemukan</p>'}
+function ed(id){const c=MP[mp][0],s=S.sis.find(x=>x.id==id),t=((S.sc[c]||{})[id]||[]).slice(),rd=()=>[...document.querySelectorAll('.tp')].map(i=>i.value.trim());
+const pvw=()=>{const x=cs(rd());$('#pv').innerHTML=x.n?`NA real <b>${fmt(x.na)}</b> · Nilai rapor <b>${x.nr}</b> · ${x.val===1?'✅ Valid':x.val===0?'⚠️ Tidak valid':'–'}`:'Isi minimal satu TP'};
+const pc=()=>{const v=rd();for(const a of v)if(a!==''&&(isNaN(a)||a<0||a>100)){Swal.showValidationMessage('Nilai harus 0 – 100');return false}return v.map(a=>a===''?'':+a)};
+SW.fire({titleText:s.n,html:`<div class=sm>${MP[mp][1]} · NIPD ${esc(s.id)}</div><div class=tpg>${Array.from({length:10},(_,k)=>`<label>TP${k+1}<input class=tp type=number step=any inputmode=decimal min=0 max=100 value="${t[k]??''}"></label>`).join('')}</div><div id=pv class=pv></div>`,
+showCancelButton:true,showDenyButton:true,confirmButtonText:'Simpan',denyButtonText:'Simpan & lanjut',cancelButtonText:'Batal',preConfirm:pc,preDeny:pc,didOpen:()=>{pvw();document.querySelectorAll('.tp').forEach(i=>i.addEventListener('input',pvw));document.querySelector('.tp').focus()}})
+.then(r=>{if(!(r.isConfirmed||r.isDenied))return;const v=r.value;(S.sc[c]=S.sc[c]||{})[id]=v;save();const x=cs(v);push({action:'nilai',mapel:c,nipd:id,nama:s.n,tp:v});toast('Nilai '+s.n.split(' ')[0]+' tersimpan');lst();if(r.isDenied){const i=S.sis.findIndex(o=>o.id==id);S.sis[i+1]&&setTimeout(()=>ed(S.sis[i+1].id),250)}})}
+/* ---------- rekap & cetak ---------- */
+function tbl(R,p){const st=a=>a.length?[Math.max(...a),Math.min(...a),avg(a)].map(fmt):['–','–','–'],cs2=MP.map((_,i)=>st(R.filter(r=>r.m[i].n).map(r=>r.m[i].nr))).concat([st(R.filter(r=>r.na).map(r=>r.na))]);
+return`<div class=tw><table><thead><tr><th>No</th><th class=n>Nama</th>${MP.map(m=>`<th>${m[2]}</th>`).join('')}<th>NA</th><th>Rank</th></tr></thead><tbody>${R.map((r,i)=>`<tr ${p?'':`data-id="${esc(r.s.id)}" onclick="rpt(this.dataset.id)"`}><td>${i+1}</td><td class=n>${esc(r.s.n)}</td>${r.m.map(x=>`<td class="${x.n&&x.nr<K?'lo':''}">${x.n?x.nr:'–'}</td>`).join('')}<td><b>${r.na?r.na.toFixed(1):'–'}</b></td><td>${r.na?r.rk:'–'}</td></tr>`).join('')}</tbody><tfoot>${['Tertinggi','Terendah','Rata-rata'].map((l,k)=>`<tr><td class=n colspan=2>${l}</td>${cs2.map(c=>`<td>${c[k]}</td>`).join('')}<td></td></tr>`).join('')}</tfoot></table></div>`}
+function rek(){const R=rows();$('#m').innerHTML=`<section class=card><h3>Rekapitulasi nilai rapor</h3><div class=bt><button class=b onclick="prn(head('REKAPITULASI NILAI')+tbl(rows(),1),1)">🖨️ Cetak rekap</button><button class="b s" onclick="prn(S.sis.map(s=>'<div class=pb>'+rap(s.id)+'</div>').join(''))">🖨️ Semua rapor</button></div><small>Ketuk baris untuk melihat & mencetak rapor siswa. Sel oranye = di bawah KKM.</small>${tbl(R)}</section>`}
+const head=t=>`<h2 style="text-align:center">${t}</h2><p style="text-align:center;margin-bottom:8px">${esc(S.cfg.sek)}<br>${esc(S.cfg.kls)} · ${esc(S.cfg.sem)}</p>`;
+function rap(id){const s=S.sis.find(x=>x.id==id),r=rows().find(x=>x.s.id==id),p=pv(id);return head('LAPORAN HASIL BELAJAR')+`<p><b>Nama</b>: ${esc(s.n)}<br><b>NIPD</b>: ${esc(s.id)}</p><table style="width:100%"><tr><th>No</th><th>Mata Pelajaran</th><th>KKM</th><th>Nilai</th><th>Predikat</th></tr>${MP.map((m,i)=>{const x=r.m[i];return`<tr><td>${i+1}</td><td style="text-align:left;white-space:normal">${m[1]}</td><td>${K}</td><td>${x.n?x.nr:'–'}</td><td>${x.n?'ABCD'[pred(x.nr)]:'–'}</td></tr>`}).join('')}<tr><th colspan=3>Rata-rata</th><th>${r.na?r.na.toFixed(1):'–'}</th><th>Ranking ${r.na?r.rk+'/'+S.sis.length:'–'}</th></tr></table><h3 style="margin-top:12px">Pramuka${p?' – Predikat '+pg(p):''}</h3><p style="text-align:justify">${esc(prd(s))}</p><p style="margin-top:26px;text-align:right">Wali Kelas,<br><br><br><b>${esc(S.cfg.guru||'………………………')}</b></p>`}
+function rpt(id){SW.fire({html:`<div style="max-height:62vh;overflow:auto;text-align:left;font-size:12px">${rap(id)}</div>`,width:'94%',showCancelButton:true,confirmButtonText:'🖨️ Cetak',cancelButtonText:'Tutup'}).then(r=>r.isConfirmed&&prn(rap(id)))}
+function prn(h,l){$('#pg').textContent=`@page{size:A4 ${l?'landscape':'portrait'};margin:12mm}`;$('#pr').innerHTML=h;setTimeout(()=>print(),200)}
+/* ---------- pramuka ---------- */
+function pra(){$('#m').innerHTML=`<section class=card><h3>Penilaian Pramuka</h3><small>Skala 1–4 untuk ${S.cfg.kls=='Kelas Atas'?'Tri Satya, Dasa Darma':'Dwi Satya, Dwi Darma'} dan Keterampilan. Deskripsi dibuat otomatis.</small></section>`+S.sis.map(s=>{const p=pv(s.id);return`<div class=row data-id="${esc(s.id)}" onclick="pe(this.dataset.id)"><b class=av>${ini(s.n)}</b><div class=gr><div class=nm>${esc(s.n)}</div><small>${p?p.map(v=>v||'–').join(' · '):'belum diisi'}</small></div><div class=sc><b>${p?pg(p):'–'}</b></div></div>`}).join('')}
+function pe(id){const s=S.sis.find(x=>x.id==id),p=S.pr[id]||['','',''],a=S.cfg.kls=='Kelas Atas',sel=(k,l)=>`<label>${l}</label><select id=ps${k}><option value="">–</option>${[4,3,2,1].map(v=>`<option value=${v} ${p[k]==v?'selected':''}>${v} · ${PM[4-v]}</option>`).join('')}</select>`;
+SW.fire({titleText:s.n,html:sel(0,a?'Tri Satya':'Dwi Satya')+sel(1,a?'Dasa Darma':'Dwi Darma')+sel(2,'Keterampilan'),showCancelButton:true,confirmButtonText:'Simpan',preConfirm:()=>[0,1,2].map(k=>$('#ps'+k).value)}).then(r=>{if(!r.isConfirmed)return;S.pr[id]=r.value.map(v=>v===''?'':+v);save();push({action:'pramuka',nipd:id,nama:s.n,v:S.pr[id]});toast();pra()})}
+/* ---------- setelan ---------- */
+const cf=(k,v)=>{S.cfg[k]=v.trim();save();hdr()};
+function set(){const c=S.cfg,f=(k,l,t)=>`<label>${l}</label><input type=${t||'text'} value="${esc(c[k])}" onchange="cf('${k}',this.value)">`;
+$('#m').innerHTML=`<section class=card><h3>Identitas</h3>${f('sek','Nama sekolah')}${f('guru','Wali kelas')}${f('sem','Semester & tahun ajaran')}<label>Kelas (menentukan deskripsi Pramuka)</label><select onchange="cf('kls',this.value)">${['Kelas Atas','Kelas Bawah'].map(k=>`<option ${k==c.kls?'selected':''}>${k}</option>`).join('')}</select></section>
+<section class=card><h3>Google Sheet</h3>${f('url','URL Web App Apps Script','url')}<div class=bt><button class=b onclick="up()">⬆️ Kirim semua</button><button class="b s" onclick="down()">⬇️ Ambil data</button></div><button class="b s" style="width:100%" onclick="help()">Cara menyambungkan</button></section>
+<section class=card><h3>Siswa & data</h3><div class=bt><button class="b s" onclick="ad()">➕ Tambah siswa</button><button class="b s" onclick="csv()">⬇️ CSV</button></div><div class=bt><button class="b s" onclick="bak()">💾 Backup</button><button class="b s" onclick="demo()">🎲 Data contoh</button></div><button class="b d" style="width:100%" onclick="rst()">Hapus semua nilai</button></section>
+<p class=ft>Konversi nilai & KKM ${K} mengikuti sheet "Kriteria".</p>`}
+function help(){SW.fire({icon:'info',title:'Sambung ke Google Sheet',html:'<ol style="text-align:left;padding-left:18px;line-height:1.7"><li>Buat Google Sheet baru → <b>Ekstensi › Apps Script</b>.</li><li>Tempel isi <b>Code.gs</b>, simpan.</li><li><b>Deploy › Deployment baru › Aplikasi web</b>. Jalankan sebagai <b>Saya</b>, akses <b>Siapa saja</b>.</li><li>Salin URL <b>/exec</b>, tempel di kolom URL, lalu tekan <b>Kirim semua</b>.</li></ol><small>Setelah itu setiap simpan nilai otomatis masuk ke Sheet. Nilai tetap tersimpan lokal jika offline.</small>'})}
+async function ad(){const r=await SW.fire({title:'Tambah siswa',html:'<input id=an class=swal2-input placeholder="Nama lengkap"><input id=ai class=swal2-input placeholder="NIPD">',showCancelButton:true,preConfirm:()=>{const n=$('#an').value.trim(),i=$('#ai').value.trim();if(!n||!i)return Swal.showValidationMessage('Nama & NIPD wajib diisi')||false;if(S.sis.some(x=>x.id==i))return Swal.showValidationMessage('NIPD sudah ada')||false;return{n,id:i}}});if(r.value){S.sis.push(r.value);save();toast('Siswa ditambahkan')}}
+function demo(){SW.fire({title:'Isi data contoh?',text:'Nilai yang ada akan diganti data acak.',icon:'question',showCancelButton:true}).then(r=>{if(!r.isConfirmed)return;const rn=()=>Math.random()<.12?15+Math.round(Math.random()*5):50+Math.round(Math.random()*50);S.sc={};MP.forEach(p=>{S.sc[p[0]]={};S.sis.forEach(s=>S.sc[p[0]][s.id]=Array.from({length:10},rn))});S.pr={};S.sis.forEach(s=>S.pr[s.id]=[0,0,0].map(()=>1+Math.ceil(Math.random()*3)));save();toast('Data contoh dibuat');go('home')})}
+function rst(){SW.fire({title:'Hapus semua nilai?',text:'Data di Google Sheet tidak ikut terhapus.',icon:'warning',showCancelButton:true,confirmButtonColor:'#d9480f',confirmButtonText:'Hapus'}).then(r=>{if(r.isConfirmed){S.sc={};S.pr={};save();toast('Nilai dihapus')}})}
+const dl=(t,n,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()};
+const bak=()=>dl(JSON.stringify(S),'backup-erapor.json','application/json');
+function csv(){const R=rows(),Q=v=>`"${String(v).replace(/"/g,'""')}"`,L=[['No','Nama','NIPD',...MP.map(p=>p[1]),'Rata-rata','Peringkat'].map(Q).join(',')];R.forEach((r,i)=>L.push([i+1,r.s.n,r.s.id,...r.m.map(x=>x.n?x.nr:''),r.na?r.na.toFixed(1):'',r.na?r.rk:''].map(Q).join(',')));dl('\ufeff'+L.join('\n'),'rekap-nilai.csv','text/csv')}
+render();
+</script></body></html>
