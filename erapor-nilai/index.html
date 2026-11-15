@@ -347,6 +347,7 @@ const cf=(k,v)=>{if(LK(k))return;S.cfg[k]=v.trim();save();hdr();if(AD()&&(k=='se
 function set(){const c=S.cfg,f=(k,l,t)=>LK(k)?`<label>${l} 🔒</label><input type=${t||'text'} value="${esc(c[k])}" readonly style="background:#eef3ef;color:var(--mu)">`:`<label>${l}</label><input type=${t||'text'} value="${esc(c[k])}" onchange="cf('${k}',this.value)">`;
 $('#m').innerHTML=`${S.auth?`<section class=card><h3>Akun</h3><div class=pv><b>${esc(S.auth.n||S.auth.u)}</b><br><small>${MO()?'Guru mapel '+MP.map(p=>esc(p[2])).join(', ')+(S.auth.all?' · semua kelas':' · kelas '+esc(S.auth.k)):S.auth.all?'Akses semua kelas':'Wali kelas '+esc(S.auth.k)}</small></div><button class="b d" style="width:100%" onclick="keluar()">Keluar</button></section>`:''}<section class=card><h3>Identitas</h3>${f('sek','Nama sekolah')}${f('guru','Wali kelas')}${f('sem','Semester & tahun ajaran')}<label>Kelas (menentukan deskripsi Pramuka)${LK('kls')?' 🔒':''}</label><select ${LK('kls')?'disabled style="background:#eef3ef;color:var(--mu)"':''} onchange="cf('kls',this.value)">${[['Kelas Atas','Kelas Atas (kelas 4–6)'],['Kelas Bawah','Kelas Bawah (kelas 1–3)']].map(([k,l])=>`<option value="${k}" ${k==c.kls?'selected':''}>${l}</option>`).join('')}</select><small>${KA()?'Otomatis dari kelas wali kelas ('+esc(S.auth.k)+'). Hanya admin yang bisa mengubah.':GL()?'Dikunci: deskripsi Pramuka mengikuti nomor kelas tiap siswa. Hanya admin yang bisa mengubah.':'Deskripsi Pramuka otomatis mengikuti nomor kelas tiap siswa (mis. 6A = Atas); pilihan ini dipakai bila kelas siswa tidak berangka.'}</small>${['sek','sem','guru'].some(LK)||KA()?'<small>🔒 Dikunci: identitas diatur admin (sheet Setelan & sheet Guru).</small>':''}${AD()?'<small>Nama sekolah & semester yang Anda ubah disimpan ke sheet Setelan dan berlaku untuk semua guru.</small>':''}</section>
 ${GL()?'':pmUi()}${GL()?'':pnUi()}${S.auth&&(!S.auth.all||MO())?'':kr()}
+${AD()&&S.cfg.url&&!S.demo?'<section class=card><h3>Manajemen pengguna</h3><small>Kelola akun login di sheet Guru: tambah, ubah, atau hapus pengguna.</small><button class="b s" style="width:100%;margin-top:8px" onclick="gu()">👥 Kelola pengguna</button></section>':''}
 <section class=card><h3>Google Sheet</h3>${GL()?`<label>Sambungan Google Sheet 🔒</label><input value="${S.cfg.url?'✅ Terhubung (diatur admin)':'⚠️ Belum terhubung, hubungi admin'}" readonly style="background:#eef3ef;color:var(--mu)">`:f('url','URL Web App Apps Script','url')}<div class=bt><button class=b onclick="up()">⬆️ Kirim semua</button><button class="b s" onclick="down()">⬇️ Ambil data</button></div>${GL()?'':'<button class="b s" style="width:100%" onclick="help()">Cara menyambungkan</button>'}</section>
 <section class=card><h3>Siswa & data</h3><div class=bt>${MO()?'':`<button class="b s" onclick="ad()">➕ Tambah siswa</button>`}${MO()?'':`<button class="b d" onclick="hs()">🗑️ Hapus siswa</button>`}${!MO()&&(!S.auth||S.auth.all)?'<button class="b s" onclick="kls()">🏫 Kelas siswa</button>':''}<button class="b s" onclick="csv()">⬇️ CSV</button></div><div class=bt><button class="b s" onclick="xl()">📗 Excel</button><button class="b s" onclick="er()">📤 e-Rapor Pusat</button><button class="b s" onclick="rk()">📘 Export Rakumaku</button><button class="b s" onclick="bak()">💾 Backup JSON</button>${MO()?'':`<button class="b s" onclick="$('#rf').click()">📥 Pulihkan</button>`}</div>${MO()?'':`<div class=bt><button class="b s" onclick="demo()">🎲 Data contoh</button><button class="b d" onclick="hd()">🧹 Hapus contoh</button></div>`}<button class="b d" style="width:100%" onclick="rst()">Hapus semua nilai</button></section>
 ${S.cfg.url&&!S.demo&&!GL()?'<section class=card><h3>Riwayat perubahan</h3><small>Siapa mengubah nilai, kapan, dan apa yang berubah.</small><button class="b s" style="width:100%;margin-top:8px" onclick="lg()">📜 Lihat riwayat</button></section>':''}
@@ -360,6 +361,49 @@ function kp(){save();push({action:'kri',kri:S.cfg.kri||{}})}
 function sj(i,v){const c=MP[km][0],n=Math.round(+v);if(v===''||!(n>=0&&n<=100))return SW.fire('Nilai jadi harus 0 – 100','','error').then(set);const a=[...kri(c,kkl)];a[i]=n;(S.cfg.kri=S.cfg.kri||{})[kkl?pk(kkl)+'|'+c:c]=a;kp();$('#kv').textContent=kk(c,kkl);const kn=$('#kn');if(kn&&kkl)kn.textContent='Pengaturan khusus Kelas '+kkl+'.';toast('Kriteria tersimpan');if(a.some((x,j)=>j&&x<a[j-1]))SW.fire({icon:'warning',title:'Urutan tidak naik',text:'Nilai jadi sebaiknya naik mengikuti nilai real.'})}
 async function ks(){const c=MP[km];if(!(await SW.fire({title:'Salin ke semua mapel?',text:kkl?'Kriteria '+c[1]+' akan dipakai semua mata pelajaran di Kelas '+kkl+'.':'Kriteria '+c[1]+' akan dipakai semua mata pelajaran (standar).',icon:'question',showCancelButton:true,confirmButtonText:'Ya, salin'})).isConfirmed)return;const a=[...kri(c[0],kkl)];S.cfg.kri=S.cfg.kri||{};MP.forEach(p=>S.cfg.kri[kkl?pk(kkl)+'|'+p[0]:p[0]]=[...a]);kp();toast('Kriteria disalin');set()}
 async function kx(){const c=MP[km];if(!(await SW.fire({title:'Reset kriteria '+c[1]+'?',text:kkl?'Pengaturan khusus Kelas '+kkl+' dihapus; kelas ini kembali mengikuti standar mapel.':'Kembali ke tabel standar (KKM '+K+').',icon:'warning',showCancelButton:true,confirmButtonText:'Reset',confirmButtonColor:'#d9480f'})).isConfirmed)return;if(kkl)delete (S.cfg.kri=S.cfg.kri||{})[pk(kkl)+'|'+c[0]];else (S.cfg.kri=S.cfg.kri||{})[c[0]]=[...KJ];kp();toast('Kriteria direset');set()}
+/* ---------- manajemen pengguna (sheet Guru), khusus admin ---------- */
+const gpost=o=>fetch(S.cfg.url,{method:'POST',body:JSON.stringify({...o,u:S.auth.u,p:S.auth.p})}).then(r=>r.json());
+const guErr=j=>String(j&&j.error||'Gagal').replace(/^Error:\s*/,'');
+const guRole=g=>{const m=g.m?g.m.split(',').map(x=>x.trim()).map(c=>(MPA.find(p=>p[0]==c)||[])[2]||c).join(', '):'';return g.k==='*'?(m?'Guru mapel · semua kelas · '+m:'Admin · semua kelas & mapel'):(m?'Guru mapel · kelas '+g.k+' · '+m:'Wali kelas '+g.k)};
+async function gu(){
+if(!AD()||!S.cfg.url||S.demo)return;
+let L=[];
+const draw=()=>{const f=($('#guq').value||'').toLowerCase(),A=L.filter(g=>!f||[g.u,g.n,g.k,g.m].join(' ').toLowerCase().includes(f));
+$('#gul').innerHTML=A.map(g=>`<div class=lgrow><div class=lgh><b>${esc(g.n||g.u)}</b><small><button class=lgx data-e="${esc(g.u)}" aria-label="Ubah">✏️</button><button class=lgx data-d="${esc(g.u)}" aria-label="Hapus">🗑️</button></small></div><small>${esc(g.u)}${g.pin?'':' · ⚠️ PIN kosong (belum bisa login)'}</small><div><small>${esc(guRole(g))}</small></div></div>`).join('')||'<p class=em>Belum ada pengguna</p>'};
+const load=async()=>{try{const j=await(await fetch(gurl()+'&a=guru')).json();if(j.error=='auth'){relog();return}if(!j.ok){$('#gul').innerHTML='<p class=em>'+(j.error=='forbidden'?'Hanya admin yang boleh membuka menu ini.':'Gagal memuat.')+'</p>';return}L=j.guru||[];draw()}catch(e){$('#gul').innerHTML='<p class=em>Gagal memuat. Periksa koneksi internet.</p>'}};
+SW.fire({title:'Manajemen pengguna',html:'<button id=gua class="b" style="width:100%">➕ Tambah pengguna</button><input id=guq type=search placeholder="Cari nama, username, kelas…" style="margin-top:8px"><div id=gul style="max-height:50vh;overflow:auto;text-align:left;margin-top:8px"><p class=em>Memuat…</p></div><small id=gum style="display:block;min-height:16px;margin-top:6px"></small>',width:'94%',showConfirmButton:false,showCloseButton:true,
+didOpen:async()=>{
+$('#guq').addEventListener('input',draw);
+$('#gua').addEventListener('click',()=>guForm(null,L));
+$('#gul').addEventListener('click',async e=>{
+const x=e.target.closest('.lgx');if(!x)return;
+if(x.dataset.e){guForm(L.find(g=>g.u==x.dataset.e),L);return}
+if(!x.classList.contains('arm')){x.classList.add('arm');x.textContent='Hapus?';setTimeout(()=>{if(x.isConnected){x.classList.remove('arm');x.textContent='🗑️'}},4000);return}
+x.disabled=true;x.textContent='…';
+try{const j=await gpost({action:'guruHapus',u:x.dataset.d});if(j.error=='auth'){relog();return}if(j.ok){$('#gum').textContent='✓ Pengguna dihapus';await load()}else{$('#gum').textContent=guErr(j);x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}}catch(err){$('#gum').textContent='Gagal menghapus. Periksa koneksi';x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}
+});
+await load()}})}
+async function guForm(g,L){
+const baru=!g,diri=!baru&&String(g.u).toLowerCase()==String(S.auth.u).toLowerCase(),pm=(g&&g.m?g.m.split(',').map(x=>x.trim()):[]),kls=[...new Set((S.sis||[]).map(s=>s.k).filter(Boolean))];
+const r=await SW.fire({title:baru?'Tambah pengguna':'Ubah pengguna',width:'94%',showCancelButton:true,confirmButtonText:'Simpan',cancelButtonText:'Batal',
+html:`<div style="text-align:left"><label>Username</label><input id=gfu value="${esc(g?g.u:'')}" ${diri?'readonly style="background:#eef3ef"':''} autocapitalize=off><label>Nama guru</label><input id=gfn value="${esc(g?g.n:'')}"><label>PIN ${baru?'':'(kosongkan = tidak diubah)'}</label><input id=gfp type=password autocomplete=new-password placeholder="${baru?'4–30 karakter':'PIN baru (opsional)'}"><label>Kelas (* = semua kelas)</label><input id=gfk list=gfl value="${esc(g?g.k:'')}" ${diri?'readonly style="background:#eef3ef"':''} placeholder="mis. 6A atau *"><datalist id=gfl><option value="*">${kls.map(k=>`<option value="${esc(k)}">`).join('')}</datalist><label>Mapel (kosongkan = semua mapel)</label><div ${diri?'style="opacity:.5;pointer-events:none"':''}>${MPA.map(p=>`<label style="display:inline-flex;gap:4px;align-items:center;margin:3px 10px 3px 0"><input type=checkbox class=gfm value="${esc(p[0])}" ${pm.includes(p[0])?'checked':''}>${esc(p[2])}</label>`).join('')}</div><small>Admin: Kelas * dan Mapel kosong · Wali kelas: isi Kelas, Mapel kosong · Guru mapel: Kelas * (atau kelas tertentu) dan centang mapel.</small>${diri?'<small>🔒 Akun Anda sendiri: username dan hak admin tidak dapat diubah.</small>':''}</div>`,
+preConfirm:()=>{const u=$('#gfu').value.trim(),n=$('#gfn').value.trim(),p=$('#gfp').value.trim(),k=$('#gfk').value.trim(),m=[...document.querySelectorAll('.gfm:checked')].map(e=>e.value).join(', ');
+if(!u)return Swal.showValidationMessage('Username wajib diisi')||false;
+if(!n)return Swal.showValidationMessage('Nama guru wajib diisi')||false;
+if(!k)return Swal.showValidationMessage('Kelas wajib diisi (tulis * untuk semua kelas)')||false;
+if(baru&&!p)return Swal.showValidationMessage('PIN wajib diisi')||false;
+if(p&&(p.length<4||p.length>30))return Swal.showValidationMessage('PIN harus 4–30 karakter')||false;
+if((L||[]).some(x=>x.u.toLowerCase()==u.toLowerCase()&&(baru||x.u!=g.u)))return Swal.showValidationMessage('Username sudah dipakai')||false;
+return{u,n,p,k,m}}});
+if(!r.value){gu();return}
+const d=r.value;
+SW.fire({title:'Menyimpan…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{const j=await gpost({action:'guruSimpan',lama:baru?'':g.u,...d});
+if(j.error=='auth'){relog();return}
+if(!j.ok){await SW.fire({icon:'error',title:'Gagal menyimpan',text:guErr(j)});guForm(g?{...g,...d,pin:g.pin}:null,L);return}
+if(diri){S.auth.n=d.n;if(d.p)S.auth.p=d.p;save()}
+toast(baru?'Pengguna ditambahkan':'Perubahan tersimpan');gu()
+}catch(err){await SW.fire({icon:'error',title:'Gagal menyimpan',text:'Periksa koneksi internet.'});gu()}}
 let LGM='';
 function lg(){if(!S.cfg.url||S.demo)return;let R=[];const AM=!GL(),msg=t=>{const e=$('#lm');if(e)e.textContent=t};
 const post=o=>fetch(S.cfg.url,{method:'POST',body:JSON.stringify(S.auth?{...o,u:S.auth.u,p:S.auth.p}:o)}).then(r=>r.json());
