@@ -2,7 +2,7 @@
   "id": "./",
   "name": "GetErapor",
   "short_name": "GetErapor",
-  "description": "Input nilai & cetak rapor Kurikulum Merdeka",
+  "description": "Input nilai Rapor Rakumaku & eRapor Kemendikbudristek",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
