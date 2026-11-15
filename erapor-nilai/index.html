@@ -17,6 +17,7 @@ header h1{font-size:17px;line-height:1.25}header small{opacity:.75;font-size:12p
 .lgx{background:none;border:0;cursor:pointer;font-size:14px;padding:0 4px;margin-left:6px;opacity:.7}.lgx.arm{background:var(--no);color:#fff;border-radius:8px;opacity:1;font-size:11px;padding:2px 8px}
 .seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1;padding:8px 4px;border:1px solid var(--ln);background:#fff;border-radius:12px;font:600 12px system-ui;color:var(--ink);cursor:pointer}.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .hm{border-collapse:collapse;width:100%;font-size:12px}.hm th,.hm td{padding:6px 5px;text-align:center;border:1px solid #fff;white-space:nowrap}.hm th{background:#eef3ef;color:var(--ink);font-weight:600}.hm td.g{background:#d7f0e0;color:#0a5a3c}.hm td.a{background:#fdf0c9;color:#7a5200}.hm td.r{background:#fbd9d3;color:#a0310a;font-weight:700}.hm td[data-i]{cursor:pointer}.hm tr.sc th,.hm tr.sc td{border-top:2px solid var(--ink)}
+#pr .hm th,#pr .hm td,#pr .tg,.hm th,.hm td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .lgnd{font-size:11px;color:var(--mu);margin:6px 0 2px;line-height:1.5}.tg{display:inline-block;font:600 11px system-ui;padding:3px 8px;border-radius:10px;margin:2px 4px 2px 0}.tg.r{background:#fbd9d3;color:#a0310a}.tg.g{background:#d7f0e0;color:#0a5a3c}
 .ans{margin:6px 0 0;padding:0;list-style:none}.ans li{font-size:13px;line-height:1.5;padding:7px 0;border-bottom:1px solid var(--ln)}.ans li:last-child{border:0}
 #m{flex:1;padding:0 14px 18px;margin-top:-36px;position:relative}
@@ -156,7 +157,7 @@ pm=MP.map((p,i)=>avg(R.filter(r=>r.m[i].n).map(r=>r.m[i].nr))),pc=MP.map((p,i)=>
 $('#m').innerHTML=`<section class="card hero"><small>Rata-rata nilai rapor kelas</small><b class=big>${ra?ra.toFixed(1):'–'}</b><small>${on.length} dari ${R.length} siswa sudah memiliki nilai</small></section>
 <div class=g2><div class="card st"><b>${Math.round(fl/ts*100)||0}%</b><small>Kelengkapan input</small></div><div class="card st"><b>${fl?Math.round(vd/fl*100):0}%</b><small>Valid e-Rapor</small></div>
 <div class="card st"><b>${hi?hi.na.toFixed(1):'–'}</b><small>Tertinggi · ${hi?esc(hi.s.n.split(' ')[0]):'-'}</small></div><div class="card st"><b>${lo?lo.na.toFixed(1):'–'}</b><small>Terendah · ${lo?esc(lo.s.n.split(' ')[0]):'-'}</small></div></div>
-<section class=card id=an></section>
+${GL()?'':'<section class=card id=an></section>'}
 <section class=card><h3>Rata-rata per mata pelajaran</h3><div style="height:310px"><canvas id=c1></canvas></div></section>
 <section class=card><h3>Sebaran predikat siswa</h3><div style="height:200px"><canvas id=c2></canvas></div></section>
 <section class=card><h3>Progres input per mapel</h3>${MI().map(i=>{const p=MP[i],tot=R.filter(r=>!r.m[i].no).length;return`<div class=pg><span>${p[2]}</span><i><u style="width:${pc[i]/(tot||1)*100}%"></u></i><small>${pc[i]}/${tot}</small></div>`}).join('')}</section>
@@ -217,14 +218,14 @@ cell[k][i]=e;const q=sch[i];q.sum+=sum;q.n+=nr.length;q.low+=low;q.N+=G.length;f
 I.forEach(i=>{const q=sch[i];q.avg=q.n?q.sum/q.n:null;q.tp=q.tps.map((v,j)=>q.tpn[j]?v/q.tpn[j]:null)});
 return{cls,I,cell,sch}}
 const pcs=(n,l)=>n?Math.round((n-l)/n*100):null;
-function anTbl(D,mode){const{cls,cell,sch}=D,I=D.I.filter(i=>sch[i].n),hid=D.I.length-I.length,T=mode=='tuntas',
+function anTbl(D,mode,noTap){const{cls,cell,sch}=D,I=D.I.filter(i=>sch[i].n),hid=D.I.length-I.length,T=mode=='tuntas',
 val=e=>T?pcs(e.n,e.low):e.avg,col=(v,kkm)=>v==null?'':T?(v<70?'r':v<85?'a':'g'):(v<=kkm?'r':v<kkm+5?'a':'g'),txt=v=>v==null?'–':T?v+'%':v.toFixed(1);
 if(!cls.length||!I.length)return'<p class=em>Belum ada nilai yang bisa dianalisis. Isi nilai di tab Input.</p>';
 const rowAvg=k=>{if(T){const n=I.reduce((a,i)=>a+cell[k][i].n,0),l=I.reduce((a,i)=>a+cell[k][i].low,0);return pcs(n,l)}const a=I.map(i=>cell[k][i].avg).filter(v=>v!=null);return a.length?avg(a):null},
 sAll=T?pcs(I.reduce((a,i)=>a+sch[i].n,0),I.reduce((a,i)=>a+sch[i].low,0)):(a=>a.length?avg(a):null)(I.map(i=>sch[i].avg).filter(v=>v!=null));
 return`<div class=tw><table class=hm><thead><tr><th>Kelas</th>${I.map(i=>`<th>${esc(MP[i][2])}</th>`).join('')}<th>Rata²</th></tr></thead><tbody>${cls.map(k=>`<tr><th>${esc(kn(k))}</th>${I.map(i=>{const e=cell[k][i],v=val(e);return`<td class="${col(v,e.kkm)}" data-i="${i}" data-k="${esc(k)}" onclick="anGo(this.dataset.i,this.dataset.k)" title="${esc(MP[i][1])} · Kelas ${esc(kn(k))} · KKM ${e.kkm} · ${e.n}/${e.N} siswa bernilai · ${e.low} belum tuntas (nilai ≤ KKM)">${txt(v)}</td>`}).join('')}<td>${txt(rowAvg(k))}</td></tr>`).join('')}
 <tr class=sc><th>Sekolah</th>${I.map(i=>{const q=sch[i],v=T?pcs(q.n,q.low):q.avg;return`<td>${txt(v)}</td>`}).join('')}<td><b style="font-size:inherit">${txt(sAll)}</b></td></tr></tbody></table></div>
-<div class=lgnd>${T?'🟥 kurang dari 70% siswa tuntas · 🟨 70–84% · 🟩 85% ke atas. Tuntas = rata-rata nilai asli siswa di atas KKM kelas.':'Rata-rata nilai asli (NA) dibanding KKM kelas: 🟥 sama atau di bawah KKM · 🟨 sampai 5 poin di atas KKM · 🟩 lebih dari 5 poin di atas KKM.'} Ketuk sel untuk melihat tren TP-nya.${hid?' '+hid+' mapel yang belum ada nilainya tidak ditampilkan.':''}</div>`}
+<div class=lgnd>${T?'🟥 kurang dari 70% siswa tuntas · 🟨 70–84% · 🟩 85% ke atas. Tuntas = rata-rata nilai asli siswa di atas KKM kelas.':'Rata-rata nilai asli (NA) dibanding KKM kelas: 🟥 sama atau di bawah KKM · 🟨 sampai 5 poin di atas KKM · 🟩 lebih dari 5 poin di atas KKM.'} ${noTap?'':'Ketuk sel untuk melihat tren TP-nya.'}${hid?' '+hid+' mapel yang belum ada nilainya tidak ditampilkan.':''}</div>`}
 const PAL=['#1c6b66','#d9480f','#7048e8','#0f9d6b','#c98a0a','#1971c2','#e64980','#868e96'];
 function anTren(D){const{cls,I,cell,sch}=D;if(!I.length||!cls.length)return{html:'<p class=em>Belum ada data siswa atau mapel.</p>'};if(!I.includes(anm))anm=I[0];if(ank&&!cls.includes(ank))ank='';
 const c=MP[anm][0],lab=Array.from({length:10},(_,j)=>'TP'+(j+1)),ds=[],kv=ank?kk(c,ank):(z=>z.size==1?[...z][0]:null)(new Set(cls.map(k=>kk(c,k))));
@@ -253,8 +254,14 @@ tr.filter(x=>x.d<=-3).sort((a,b)=>a.d-b.d).slice(0,2).forEach(x=>A.push(`🔻 <b
 tr.filter(x=>x.d>=3).sort((a,b)=>b.d-a.d).slice(0,2).forEach(x=>A.push(`🔺 <b>${esc(mn(x.i))}</b> cenderung naik (+${f(x.d)} poin); praktik pembelajarannya layak dibagikan.`));
 return A}
 function anR(){const e=$('#an');if(!e)return;const D=anData();let body='',cfg=null;if(an=='tren'){const t=anTren(D);body=t.html;cfg=t.cfg}else body=anTbl(D,an);
-e.innerHTML=`<h3>Analisis nilai</h3><div class=seg>${ANT.map(([k,l])=>`<button class="${k==an?'on':''}" onclick="an='${k}';anR()">${l}</button>`).join('')}</div>${body}<h3 style="margin-top:14px">Saran otomatis</h3><ul class=ans>${anAdvice(D).map(t=>`<li>${t}</li>`).join('')}</ul><div class=lgnd>Dihitung otomatis dari nilai asli (TP) yang sudah diisi dan KKM tiap kelas.</div>`;
+e.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 style="margin:0">Analisis nilai</h3><button class="b s" style="padding:6px 12px;font-size:12px" onclick="anPrint()">🖨️ Cetak</button></div><div class=seg>${ANT.map(([k,l])=>`<button class="${k==an?'on':''}" onclick="an='${k}';anR()">${l}</button>`).join('')}</div>${body}<h3 style="margin-top:14px">Saran otomatis</h3><ul class=ans>${anAdvice(D).map(t=>`<li>${t}</li>`).join('')}</ul><div class=lgnd>Dihitung otomatis dari nilai asli (TP) yang sudah diisi dan KKM tiap kelas.</div>`;
 if(cfg)ch('anc',cfg)}
+const tpRow=(tp,kkm)=>tp.map((v,j)=>{const d=j&&v!=null&&tp[j-1]!=null?v-tp[j-1]:0;return`<td class="${kkm!=null&&v!=null&&v<=kkm?'r':''}">${v==null?'–':v.toFixed(1)}${d<=-5?' ↓':d>=5?' ↑':''}</td>`}).join('');
+function anTrenMat(D){const{cls,cell,sch}=D,I=D.I.filter(i=>sch[i].n),hd=`<tr><th>Mapel</th>${Array.from({length:10},(_,j)=>`<th>TP${j+1}</th>`).join('')}</tr>`;
+if(!I.length)return'<p>Belum ada nilai.</p>';
+return`<h4 style="margin:6px 0 4px">Rata-rata sekolah</h4><table class=hm>${hd}${I.map(i=>`<tr><th>${esc(MP[i][2])}</th>${tpRow(sch[i].tp,null)}</tr>`).join('')}</table>`+cls.map(k=>{const J=I.filter(i=>cell[k][i].n);return J.length?`<div style="page-break-inside:avoid"><h4 style="margin:10px 0 4px">Kelas ${esc(kn(k))}</h4><table class=hm>${hd}${J.map(i=>`<tr><th>${esc(MP[i][2])}</th>${tpRow(cell[k][i].tp,cell[k][i].kkm)}</tr>`).join('')}</table></div>`:''}).join('')+'<p class=lgnd>↓ turun ≥5 poin dari TP sebelumnya · ↑ naik ≥5 poin. Sel merah = rata-rata nilai asli TP sama atau di bawah KKM kelas.</p>'}
+function anPrint(){if(GL())return;const D=anData(),cv=an=='tren'?$('#anc'):null;let img='';try{if(cv&&cv.toDataURL)img=`<h3>Grafik tren TP (pilihan di layar: ${esc(MP[anm]?MP[anm][1]:'')}, ${ank?'Kelas '+esc(kn(ank)):'semua kelas'})</h3><img src="${cv.toDataURL('image/png')}" style="max-width:100%;max-height:300px">`}catch(e){}
+prn(`<h2 style="text-align:center">ANALISIS NILAI</h2><p style="text-align:center;margin-bottom:8px">${esc(S.cfg.sek)}<br>${esc(S.cfg.sem)}</p><h3>1. Peta nilai</h3>${anTbl(D,'peta',1)}<h3>2. Ketuntasan</h3>${anTbl(D,'tuntas',1)}<h3>3. Tren rata-rata nilai asli antar TP</h3>${anTrenMat(D)}${img}<h3>4. Saran otomatis</h3><ul class=ans>${anAdvice(D).map(t=>`<li>${t}</li>`).join('')}</ul><p class=lgnd>Dicetak ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})} · dihitung otomatis dari nilai asli (TP) dan KKM tiap kelas.</p>`,1)}
 function anGo(i,k){an='tren';anm=+i;ank=k;anR();const e=$('#an');if(e&&e.scrollIntoView)e.scrollIntoView({behavior:'smooth',block:'start'})}
 /* ---------- pesan mapel (admin) ---------- */
 let pmk='';
