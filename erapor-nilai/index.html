@@ -380,7 +380,7 @@ const x=e.target.closest('.lgx');if(!x)return;
 if(x.dataset.e){guForm(L.find(g=>g.u==x.dataset.e),L);return}
 if(!x.classList.contains('arm')){x.classList.add('arm');x.textContent='Hapus?';setTimeout(()=>{if(x.isConnected){x.classList.remove('arm');x.textContent='🗑️'}},4000);return}
 x.disabled=true;x.textContent='…';
-try{const j=await gpost({action:'guruHapus',u:x.dataset.d});if(j.error=='auth'){relog();return}if(j.ok){$('#gum').textContent='✓ Pengguna dihapus';await load()}else{$('#gum').textContent=guErr(j);x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}}catch(err){$('#gum').textContent='Gagal menghapus. Periksa koneksi';x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}
+try{const j=await gpost({action:'guruHapus',target:x.dataset.d});if(j.error=='auth'){relog();return}if(j.ok){$('#gum').textContent='✓ Pengguna dihapus';await load()}else{$('#gum').textContent=guErr(j);x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}}catch(err){$('#gum').textContent='Gagal menghapus. Periksa koneksi';x.disabled=false;x.classList.remove('arm');x.textContent='🗑️'}
 });
 await load()}})}
 async function guForm(g,L){
@@ -398,7 +398,7 @@ return{u,n,p,k,m}}});
 if(!r.value){gu();return}
 const d=r.value;
 SW.fire({title:'Menyimpan…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
-try{const j=await gpost({action:'guruSimpan',lama:baru?'':g.u,...d});
+try{const j=await gpost({action:'guruSimpan',lama:baru?'':g.u,nu:d.u,nn:d.n,nk:d.k,nm:d.m,np:d.p});
 if(j.error=='auth'){relog();return}
 if(!j.ok){await SW.fire({icon:'error',title:'Gagal menyimpan',text:guErr(j)});guForm(g?{...g,...d,pin:g.pin}:null,L);return}
 if(diri){S.auth.n=d.n;if(d.p)S.auth.p=d.p;save()}
